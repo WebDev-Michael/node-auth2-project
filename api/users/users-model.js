@@ -17,10 +17,17 @@ function find() {
         "role_name": "instructor"
       }
     ]
+    select
+        user_id,
+        username,
+        role_name
+    from users
+    join roles on 
+        users.role_id = roles.role_id
    */
-    return db("users as u")
-    .join("roles as r", "u.role", "=", "r.role_id")
-    .select("u.user_id", "u.username", "r.role_name as role")
+    return db("users")
+    .join("roles", "users.role_id", "roles.role_id")
+    .select("user_id", "username", "role_name")
 }
 
 function findBy(filter) {
@@ -37,9 +44,9 @@ function findBy(filter) {
       }
     ]
    */
-    return db("users as u")
-    .join("roles as r", "u.role", "=", "r.role_id")
-    .select("u.user_id", "u.username", "r.role_name as role", "u.password")
+    return db("users")
+    .join("roles", "user.role_id", "roles.role_id")
+    .select("user_id", "username", "role_name", "password")
     .where(filter)
 }
 
@@ -54,10 +61,10 @@ function findById(user_id) {
       "role_name": "instructor"
     }
    */
-    return db("users as u")
-    .join("roles as r", "u.role", "=", "r.role_id")
-    .select("u.user_id", "u.username", "r.role_name as role")
-    .where("u.user_id", user_id)
+    return db("users")
+    .join("roles", "users.role_id", "roles.role_id")
+    .select("user_id", "username", "password", "role_name")
+    .where("users.user_id", user_id)
     .first()
 }
 
