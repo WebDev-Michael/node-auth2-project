@@ -75,7 +75,7 @@ const checkUsernameExists = async (req, res, next) => {
 }
 
 
-const validateRoleName = (req, res, next) => {
+const validateRoleName = async (req, res, next) => {
   /*
     If the role_name in the body is valid, set req.role_name to be the trimmed string and proceed.
 
@@ -94,15 +94,21 @@ const validateRoleName = (req, res, next) => {
       "message": "Role name can not be longer than 32 chars"
     }
   */
-    if (!req.body.role_name || !req.body.role_name.trim()) {
-      req.role_name = 'student'
-    } else if (req.body.role_name.trim() === 'admin') {
-      next({ status: 422, message: 'Role name can not be admin' })
-    } else if (req.body.role_name.trim().length > 32) {
-      next({ status: 422, message: 'Role name can not be longer than 32 chars' })
+    const { role_name } = req.body;
+
+    if (role_name === undefined || role_name.trim().length === 0) {
+      req.role_name = "student";
+      next();
+    } else if (role_name.trim() === "admin") {
+      next({ status: 422, message: "Role name can not be admin" });
+    } else if (role_name.trim().length > 32) {
+      next({ status: 422, message: "Role name can not be longer than 32 chars" });
+    } else if (await User.validRole(role_name.trim())) {
+      req.role_name = role_name.trim();
+      next();
     } else {
-      req.role_name = req.body.role_name.trim()
-      next()
+      req.role_name = role_name.trim();
+      next();
     }
 }
 
